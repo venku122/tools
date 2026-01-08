@@ -256,8 +256,8 @@
     </main>
 
     <footer>
-      <a href="https://github.com/USER/REPO/blob/main/tools/json-to-yaml.html" id="sourceLink">View source</a>
-      <a href="https://example.com/transcript" id="transcriptLink">Transcript</a>
+      <a href="#" id="sourceLink">View source</a>
+      <a href="#" id="transcriptLink">Transcript</a>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
@@ -270,6 +270,20 @@
       const clearButton = document.getElementById("clearButton");
       const autoToggle = document.getElementById("autoToggle");
       const status = document.getElementById("status");
+      const sourceLink = document.getElementById("sourceLink");
+      const transcriptLink = document.getElementById("transcriptLink");
+
+      const REPO = "venku122/tools";
+      const BRANCH = "main";
+      const fileName = window.location.pathname.split("/").pop();
+      const slug = fileName.replace(/\.html$/i, "");
+
+      if (sourceLink) {
+        sourceLink.href = `https://github.com/${REPO}/blob/${BRANCH}/tools/${fileName}`;
+      }
+      if (transcriptLink) {
+        transcriptLink.href = `https://github.com/${REPO}/blob/${BRANCH}/transcripts/${slug}.md`;
+      }
 
       const sampleJson = JSON.stringify(
         {
