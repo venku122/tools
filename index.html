@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HTML Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f1ea;
+        --bg-accent: #f9e8d2;
+        --ink: #1f1c17;
+        --muted: #5d564d;
+        --card: #fffdf9;
+        --card-border: rgba(31, 28, 23, 0.08);
+        --accent: #d17a2f;
+        --accent-strong: #9b4d17;
+        --shadow: 0 18px 40px rgba(31, 28, 23, 0.12);
+        --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+        --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: radial-gradient(circle at top left, #fdebd5 0%, transparent 55%),
+          radial-gradient(circle at 80% 20%, #f7d1b0 0%, transparent 50%),
+          linear-gradient(180deg, var(--bg) 0%, #f8f5ef 100%);
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: absolute;
+        width: 360px;
+        height: 360px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(209, 122, 47, 0.18), transparent 70%);
+        z-index: -1;
+      }
+
+      body::before {
+        top: -120px;
+        right: -140px;
+      }
+
+      body::after {
+        bottom: -160px;
+        left: -160px;
+        background: radial-gradient(circle, rgba(155, 77, 23, 0.16), transparent 70%);
+      }
+
+      header {
+        padding: 56px 20px 24px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 0.75rem;
+        color: var(--accent-strong);
+        font-weight: 600;
+      }
+
+      h1 {
+        font-family: var(--font-display);
+        font-size: clamp(2.2rem, 4vw, 3.2rem);
+        margin: 12px 0 8px;
+      }
+
+      header p {
+        max-width: 720px;
+        font-size: 1.1rem;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .controls {
+        margin-top: 28px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .search {
+        flex: 1 1 260px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 999px;
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow);
+      }
+
+      .search input {
+        border: none;
+        background: transparent;
+        font-size: 1rem;
+        flex: 1;
+        font-family: var(--font-body);
+        color: var(--ink);
+        outline: none;
+      }
+
+      .count {
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px 64px;
+      }
+
+      .tool-grid {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+      }
+
+      .tool-card {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        animation: lift-in 520ms ease both;
+        animation-delay: var(--delay, 0s);
+      }
+
+      .tool-card h2 {
+        font-family: var(--font-display);
+        margin: 0;
+        font-size: 1.4rem;
+      }
+
+      .tool-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(209, 122, 47, 0.12);
+        color: var(--accent-strong);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .card-actions {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: transform 180ms ease, box-shadow 180ms ease;
+        box-shadow: 0 10px 20px rgba(209, 122, 47, 0.25);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .link {
+        color: var(--accent-strong);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .empty {
+        margin-top: 32px;
+        padding: 24px;
+        border-radius: 16px;
+        background: rgba(31, 28, 23, 0.04);
+        color: var(--muted);
+      }
+
+      footer {
+        max-width: 1100px;
+        margin: 0 auto 40px;
+        padding: 0 20px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      @keyframes lift-in {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .tool-card {
+          animation: none;
+        }
+
+        .btn {
+          transition: none;
+        }
+      }
+
+      @media (max-width: 640px) {
+        header {
+          padding-top: 40px;
+        }
+
+        .controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="eyebrow">Single-file tools</div>
+      <h1>HTML Tools</h1>
+      <p>Small, fast utilities built as one HTML file each. Copy, ship, and open them anywhere.</p>
+      <div class="controls">
+        <div class="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6 6 0 1 0-.71.71l.27.28v.79L20 20.5 21.5 19l-6-5zM10 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+          </svg>
+          <input id="search" type="search" placeholder="Search tools" aria-label="Search tools">
+        </div>
+        <div class="count" id="resultCount">0 tools</div>
+      </div>
+    </header>
+
+    <main>
+      <ul class="tool-grid" id="toolGrid">
+        <li class="tool-card" data-tags="json yaml convert" style="--delay: 0s;">
+          <div class="card-top">
+            <h2>JSON to YAML</h2>
+            <span class="chip">Converter</span>
+          </div>
+          <p>Paste JSON, get clean YAML. Includes copy-to-clipboard and a sample input.</p>
+          <div class="card-actions">
+            <a class="btn" href="tools/json-to-yaml.html">Open tool</a>
+          </div>
+        </li>
+      </ul>
+      <div class="empty" id="emptyState" hidden>
+        No tools match that search yet. Try a shorter query.
+      </div>
+    </main>
+
+    <footer>
+      Add new tools in <code>tools/</code> and update this list. Use the template for a consistent layout.
+    </footer>
+
+    <script>
+      const searchInput = document.getElementById("search");
+      const cards = Array.from(document.querySelectorAll(".tool-card"));
+      const emptyState = document.getElementById("emptyState");
+      const resultCount = document.getElementById("resultCount");
+
+      function updateFilter() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          const title = card.querySelector("h2").textContent;
+          const description = card.querySelector("p").textContent;
+          const tags = card.dataset.tags || "";
+          const haystack = `${title} ${description} ${tags}`.toLowerCase();
+          const isMatch = !query || haystack.includes(query);
+
+          card.hidden = !isMatch;
+          if (isMatch) {
+            visibleCount += 1;
+          }
+        });
+
+        emptyState.hidden = visibleCount !== 0;
+        resultCount.textContent = `${visibleCount} tool${visibleCount === 1 ? "" : "s"}`;
+      }
+
+      searchInput.addEventListener("input", updateFilter);
+      updateFilter();
+    </script>
+  </body>
+</html>

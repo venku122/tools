@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JSON to YAML</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f2ea;
+        --panel: #fffdf8;
+        --ink: #201c16;
+        --muted: #655b50;
+        --accent: #c64f2d;
+        --accent-strong: #8f3218;
+        --border: rgba(32, 28, 22, 0.12);
+        --shadow: 0 18px 36px rgba(32, 28, 22, 0.12);
+        --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+        --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+        --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: radial-gradient(circle at 15% 15%, #f9d9b7 0%, transparent 45%),
+          radial-gradient(circle at 85% 10%, #f4bca8 0%, transparent 40%),
+          linear-gradient(180deg, var(--bg), #fdf9f3 100%);
+        min-height: 100vh;
+      }
+
+      header {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 48px 20px 24px;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: var(--accent-strong);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      h1 {
+        font-family: var(--font-display);
+        font-size: clamp(2.2rem, 4vw, 3.2rem);
+        margin: 16px 0 8px;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+        max-width: 720px;
+      }
+
+      main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 20px 32px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: lift-in 520ms ease both;
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 1.3rem;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 240px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        padding: 12px;
+        font-family: var(--font-mono);
+        font-size: 0.95rem;
+        background: #ffffff;
+        resize: vertical;
+      }
+
+      textarea[readonly] {
+        background: #fbf7f2;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        background: var(--accent);
+        color: #fff;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+        box-shadow: 0 12px 20px rgba(198, 79, 45, 0.25);
+      }
+
+      button.secondary {
+        background: transparent;
+        color: var(--accent-strong);
+        border: 1px solid rgba(198, 79, 45, 0.4);
+        box-shadow: none;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+      }
+
+      .status {
+        font-size: 0.9rem;
+        color: var(--muted);
+        min-height: 1.2em;
+      }
+
+      .status[data-tone="error"] {
+        color: #9b2d2d;
+      }
+
+      .status[data-tone="success"] {
+        color: #2b6f4a;
+      }
+
+      .options {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .options label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+      }
+
+      .options input[type="checkbox"] {
+        accent-color: var(--accent);
+      }
+
+      footer {
+        max-width: 1180px;
+        margin: 0 auto 32px;
+        padding: 0 20px;
+        font-size: 0.9rem;
+        color: var(--muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      footer a {
+        color: var(--accent-strong);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      @keyframes lift-in {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .panel,
+        button {
+          animation: none;
+          transition: none;
+        }
+      }
+
+      @media (max-width: 700px) {
+        header {
+          padding-top: 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="back-link" href="../index.html">Back to tools</a>
+      <h1>JSON to YAML</h1>
+      <p>Paste JSON, convert to clean YAML, and copy it out. Everything runs in the browser.</p>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>JSON input</h2>
+        <label for="jsonInput">Paste JSON</label>
+        <textarea id="jsonInput" placeholder="{\n  \"name\": \"example\",\n  \"tags\": [\"alpha\", \"beta\"]\n}"></textarea>
+        <div class="actions">
+          <button id="convertButton">Convert to YAML</button>
+          <button class="secondary" id="sampleButton">Load sample</button>
+          <button class="secondary" id="clearButton">Clear</button>
+        </div>
+        <div class="options">
+          <label>
+            <input type="checkbox" id="autoToggle" checked>
+            Auto convert on input
+          </label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>YAML output</h2>
+        <label for="yamlOutput">Result</label>
+        <textarea id="yamlOutput" readonly placeholder="YAML output appears here"></textarea>
+        <div class="actions">
+          <button id="copyButton">Copy YAML</button>
+        </div>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer>
+      <a href="https://github.com/USER/REPO/blob/main/tools/json-to-yaml.html" id="sourceLink">View source</a>
+      <a href="https://example.com/transcript" id="transcriptLink">Transcript</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script>
+      const jsonInput = document.getElementById("jsonInput");
+      const yamlOutput = document.getElementById("yamlOutput");
+      const convertButton = document.getElementById("convertButton");
+      const copyButton = document.getElementById("copyButton");
+      const sampleButton = document.getElementById("sampleButton");
+      const clearButton = document.getElementById("clearButton");
+      const autoToggle = document.getElementById("autoToggle");
+      const status = document.getElementById("status");
+
+      const sampleJson = JSON.stringify(
+        {
+          name: "Sample payload",
+          version: 1,
+          tags: ["alpha", "beta"],
+          settings: {
+            enabled: true,
+            timeoutSeconds: 30,
+          },
+        },
+        null,
+        2
+      );
+
+      let debounceTimer = null;
+
+      function setStatus(message, tone = "info") {
+        status.textContent = message;
+        status.dataset.tone = tone;
+      }
+
+      function convertJson() {
+        const raw = jsonInput.value.trim();
+        if (!raw) {
+          yamlOutput.value = "";
+          setStatus("Paste JSON to convert.", "info");
+          return;
+        }
+
+        try {
+          const parsed = JSON.parse(raw);
+          const yaml = jsyaml.dump(parsed, {
+            lineWidth: 1000,
+            noRefs: true,
+          });
+          yamlOutput.value = yaml;
+          setStatus("Converted to YAML.", "success");
+        } catch (error) {
+          yamlOutput.value = "";
+          setStatus(`Invalid JSON: ${error.message}`, "error");
+        }
+      }
+
+      function scheduleConvert() {
+        if (!autoToggle.checked) {
+          return;
+        }
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(convertJson, 250);
+      }
+
+      async function copyYaml() {
+        if (!yamlOutput.value) {
+          setStatus("Nothing to copy yet.", "error");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(yamlOutput.value);
+          setStatus("YAML copied to clipboard.", "success");
+        } catch (error) {
+          yamlOutput.select();
+          document.execCommand("copy");
+          setStatus("YAML copied to clipboard.", "success");
+        }
+      }
+
+      convertButton.addEventListener("click", convertJson);
+      copyButton.addEventListener("click", copyYaml);
+      sampleButton.addEventListener("click", () => {
+        jsonInput.value = sampleJson;
+        convertJson();
+      });
+      clearButton.addEventListener("click", () => {
+        jsonInput.value = "";
+        yamlOutput.value = "";
+        setStatus("Cleared.", "info");
+      });
+      jsonInput.addEventListener("input", scheduleConvert);
+      autoToggle.addEventListener("change", () => {
+        if (autoToggle.checked) {
+          convertJson();
+        }
+      });
+
+      setStatus("Paste JSON to get started.", "info");
+    </script>
+  </body>
+</html>

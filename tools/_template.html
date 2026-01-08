@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tool Template</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f1ea;
+        --panel: #fffdf9;
+        --ink: #1f1c17;
+        --muted: #5d564d;
+        --accent: #2f6d87;
+        --accent-strong: #1b4253;
+        --border: rgba(31, 28, 23, 0.12);
+        --shadow: 0 16px 32px rgba(31, 28, 23, 0.12);
+        --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+        --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+        --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: radial-gradient(circle at top, #d9eef3 0%, transparent 60%),
+          linear-gradient(180deg, var(--bg), #f8f5ef 100%);
+        min-height: 100vh;
+      }
+
+      header {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 20px 24px;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: var(--accent-strong);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      h1 {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 4vw, 3rem);
+        margin: 16px 0 8px;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px 40px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: rise 520ms ease both;
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      textarea,
+      input[type="text"] {
+        width: 100%;
+        min-height: 160px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        padding: 12px;
+        font-family: var(--font-mono);
+        font-size: 0.95rem;
+        background: #ffffff;
+        resize: vertical;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        background: var(--accent);
+        color: #fff;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+        box-shadow: 0 12px 20px rgba(47, 109, 135, 0.25);
+      }
+
+      button.secondary {
+        background: transparent;
+        color: var(--accent-strong);
+        border: 1px solid rgba(47, 109, 135, 0.35);
+        box-shadow: none;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+      }
+
+      .status {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .status[data-tone="error"] {
+        color: #9b2d2d;
+      }
+
+      .status[data-tone="success"] {
+        color: #2b6f4a;
+      }
+
+      footer {
+        max-width: 1100px;
+        margin: 0 auto 32px;
+        padding: 0 20px;
+        font-size: 0.9rem;
+        color: var(--muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      footer a {
+        color: var(--accent-strong);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .panel,
+        button {
+          animation: none;
+          transition: none;
+        }
+      }
+
+      @media (max-width: 700px) {
+        header {
+          padding-top: 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="back-link" href="../index.html">Back to tools</a>
+      <h1>Tool Name</h1>
+      <p>One sentence describing what this tool does and why it is useful.</p>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Input</h2>
+        <label for="input">Paste input</label>
+        <textarea id="input" placeholder="Paste or type here"></textarea>
+      </section>
+
+      <section class="panel">
+        <h2>Output</h2>
+        <label for="output">Result</label>
+        <textarea id="output" readonly placeholder="Output appears here"></textarea>
+        <div class="actions">
+          <button id="runButton">Run tool</button>
+          <button class="secondary" id="copyButton">Copy output</button>
+        </div>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer>
+      <a href="https://github.com/USER/REPO/blob/main/tools/TOOL.html" id="sourceLink">View source</a>
+      <a href="https://example.com/transcript" id="transcriptLink">Transcript</a>
+    </footer>
+
+    <script>
+      const input = document.getElementById("input");
+      const output = document.getElementById("output");
+      const runButton = document.getElementById("runButton");
+      const copyButton = document.getElementById("copyButton");
+      const status = document.getElementById("status");
+
+      function setStatus(message, tone = "info") {
+        status.textContent = message;
+        status.dataset.tone = tone;
+      }
+
+      function runTool() {
+        try {
+          output.value = input.value.trim();
+          setStatus("Done.", "success");
+        } catch (error) {
+          output.value = "";
+          setStatus(error.message, "error");
+        }
+      }
+
+      async function copyOutput() {
+        if (!output.value) {
+          setStatus("Nothing to copy yet.", "error");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(output.value);
+          setStatus("Copied to clipboard.", "success");
+        } catch (error) {
+          output.select();
+          document.execCommand("copy");
+          setStatus("Copied to clipboard.", "success");
+        }
+      }
+
+      runButton.addEventListener("click", runTool);
+      copyButton.addEventListener("click", copyOutput);
+    </script>
+  </body>
+</html>
