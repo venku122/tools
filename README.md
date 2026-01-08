@@ -20,7 +20,7 @@ Single-file HTML tools hosted on GitHub Pages. No build step, no frameworks, and
 ## GitHub Pages
 
 In GitHub: Settings -> Pages -> Deploy from a branch -> `main` (root).
-Your site will be available at `https://venku122.github.io/tools/`.
+Your site will be available at `https://tarazevits.io/tools/`.
 
 ## Conventions
 
