@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Oracle: The River War</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f1f4f7;
+        --panel: #ffffff;
+        --ink: #1d1f23;
+        --muted: #5d6570;
+        --accent: #2f6d87;
+        --accent-strong: #1c485a;
+        --border: rgba(29, 31, 35, 0.12);
+        --shadow: 0 16px 32px rgba(29, 31, 35, 0.12);
+        --river: #3a8db5;
+        --player: #2f6d87;
+        --ai: #b54d3a;
+        --neutral: #c9cfd6;
+        --contested: #f0b400;
+        --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+        --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+        --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: radial-gradient(circle at top, #d9eef3 0%, transparent 60%),
+          linear-gradient(180deg, var(--bg), #ffffff 100%);
+        min-height: 100vh;
+      }
+
+      header {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 48px 20px 24px;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: var(--accent-strong);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      h1 {
+        font-family: var(--font-display);
+        font-size: clamp(2.1rem, 4vw, 3rem);
+        margin: 16px 0 8px;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+        max-width: 720px;
+      }
+
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px 48px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: rise 520ms ease both;
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+      }
+
+      .map-wrap {
+        position: relative;
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: linear-gradient(140deg, #f7f9fb, #eaf1f6);
+        overflow: hidden;
+        min-height: 280px;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .legend i {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .meters {
+        display: grid;
+        gap: 12px;
+      }
+
+      .meter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: #f6f8fb;
+        border: 1px solid rgba(29, 31, 35, 0.08);
+      }
+
+      .meter span {
+        font-weight: 600;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        background: var(--accent);
+        color: #fff;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+        box-shadow: 0 12px 20px rgba(47, 109, 135, 0.25);
+      }
+
+      button.secondary {
+        background: transparent;
+        color: var(--accent-strong);
+        border: 1px solid rgba(47, 109, 135, 0.35);
+        box-shadow: none;
+      }
+
+      button.ghost {
+        background: #f4f6f9;
+        color: var(--accent-strong);
+        box-shadow: none;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+      }
+
+      .log {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 10px;
+        max-height: 320px;
+        overflow: auto;
+      }
+
+      .log li {
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: #f6f8fb;
+        border: 1px solid rgba(29, 31, 35, 0.08);
+        font-size: 0.95rem;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 180px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        padding: 12px;
+        font-family: var(--font-mono);
+        font-size: 0.92rem;
+        background: #ffffff;
+        resize: vertical;
+      }
+
+      .status {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .status[data-tone="error"] {
+        color: #9b2d2d;
+      }
+
+      .status[data-tone="success"] {
+        color: #2b6f4a;
+      }
+
+      .pulse {
+        animation: pulse 900ms ease-in-out infinite;
+      }
+
+      footer {
+        max-width: 1200px;
+        margin: 0 auto 32px;
+        padding: 0 20px;
+        font-size: 0.9rem;
+        color: var(--muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      footer a {
+        color: var(--accent-strong);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(240, 180, 0, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 0 8px rgba(240, 180, 0, 0.1);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .panel,
+        button,
+        .pulse {
+          animation: none;
+          transition: none;
+        }
+      }
+
+      @media (max-width: 720px) {
+        header {
+          padding-top: 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="back-link" href="../index.html">Back to tools</a>
+      <h1>Oracle: The River War</h1>
+      <p>Run a 20-turn strategic simulation of river nodes, contested crossings, and evolving war plans in one self-contained dashboard.</p>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>River Map</h2>
+        <div class="map-wrap">
+          <canvas id="map" width="640" height="360" aria-label="River map"></canvas>
+        </div>
+        <div class="legend">
+          <span><i style="background: var(--player);"></i>Player</span>
+          <span><i style="background: var(--ai);"></i>Oracle AI</span>
+          <span><i style="background: var(--neutral);"></i>Neutral</span>
+          <span><i style="background: var(--contested);"></i>Contested</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Meters</h2>
+        <div class="meters" id="meters"></div>
+        <div class="status" id="turnStatus">Turn 0 of 20. Ready to begin.</div>
+      </section>
+
+      <section class="panel">
+        <h2>Actions</h2>
+        <div class="actions">
+          <button id="runTurn">Run 1 turn</button>
+          <button id="runLoop" class="secondary">Run 20-turn loop</button>
+          <button id="reset" class="ghost">Reset scenario</button>
+        </div>
+        <div class="status" id="actionStatus" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Turn Log</h2>
+        <ul class="log" id="log"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Output</h2>
+        <label for="output">End-of-turn summary</label>
+        <textarea id="output" readonly placeholder="Run the simulation to generate a summary."></textarea>
+        <div class="actions">
+          <button id="copySummary">Copy summary</button>
+          <button id="copyState" class="secondary">Copy full state</button>
+        </div>
+        <div class="status" id="copyStatus" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer>
+      <a href="#" id="sourceLink">View source</a>
+      <a href="#" id="transcriptLink">Transcript</a>
+    </footer>
+
+    <script>
+      const mapCanvas = document.getElementById("map");
+      const metersEl = document.getElementById("meters");
+      const logEl = document.getElementById("log");
+      const outputEl = document.getElementById("output");
+      const turnStatus = document.getElementById("turnStatus");
+      const actionStatus = document.getElementById("actionStatus");
+      const copyStatus = document.getElementById("copyStatus");
+      const runTurnButton = document.getElementById("runTurn");
+      const runLoopButton = document.getElementById("runLoop");
+      const resetButton = document.getElementById("reset");
+      const copySummaryButton = document.getElementById("copySummary");
+      const copyStateButton = document.getElementById("copyState");
+      const sourceLink = document.getElementById("sourceLink");
+      const transcriptLink = document.getElementById("transcriptLink");
+
+      const REPO = "venku122/tools";
+      const BRANCH = "main";
+      const fileName = window.location.pathname.split("/").pop();
+      const slug = fileName.replace(/\.html$/i, "");
+
+      if (sourceLink) {
+        sourceLink.href = `https://github.com/${REPO}/blob/${BRANCH}/tools/${fileName}`;
+      }
+      if (transcriptLink) {
+        transcriptLink.href = `https://github.com/${REPO}/blob/${BRANCH}/transcripts/${slug}.md`;
+      }
+
+      const baseState = () => ({
+        turn: 0,
+        maxTurns: 20,
+        resources: {
+          grain: 40,
+          iron: 18,
+          morale: 65
+        },
+        research: {
+          level: 1,
+          progress: 0,
+          threshold: 100
+        },
+        buildQueue: [
+          { name: "River Pontoons", cost: { grain: 20, iron: 8 }, progress: 0, impact: "+2 mobility" },
+          { name: "Signal Towers", cost: { grain: 12, iron: 6 }, progress: 0, impact: "+8 morale" }
+        ],
+        nodes: [
+          { id: "delta", name: "Delta Gate", x: 90, y: 280, owner: "player", production: { grain: 6, iron: 2 }, contested: false },
+          { id: "ferry", name: "Ferry Forge", x: 180, y: 210, owner: "player", production: { grain: 4, iron: 4 }, contested: false },
+          { id: "spire", name: "Spire Bend", x: 300, y: 150, owner: "neutral", production: { grain: 5, iron: 1 }, contested: false },
+          { id: "canal", name: "Canal Watch", x: 420, y: 120, owner: "ai", production: { grain: 3, iron: 5 }, contested: false },
+          { id: "marsh", name: "Marsh Crown", x: 530, y: 200, owner: "ai", production: { grain: 4, iron: 3 }, contested: false },
+          { id: "rift", name: "Rift Lock", x: 580, y: 80, owner: "neutral", production: { grain: 2, iron: 2 }, contested: false }
+        ],
+        aiPressure: 1,
+        lastSummary: ""
+      });
+
+      let state = baseState();
+
+      const ownerColors = {
+        player: getComputedStyle(document.documentElement).getPropertyValue("--player").trim(),
+        ai: getComputedStyle(document.documentElement).getPropertyValue("--ai").trim(),
+        neutral: getComputedStyle(document.documentElement).getPropertyValue("--neutral").trim(),
+        contested: getComputedStyle(document.documentElement).getPropertyValue("--contested").trim()
+      };
+
+      function setStatus(el, message, tone = "info") {
+        el.textContent = message;
+        el.dataset.tone = tone;
+      }
+
+      function addLog(message) {
+        const item = document.createElement("li");
+        item.textContent = message;
+        logEl.prepend(item);
+      }
+
+      function updateMeters() {
+        metersEl.innerHTML = "";
+        const items = [
+          { label: "Grain", value: state.resources.grain },
+          { label: "Iron", value: state.resources.iron },
+          { label: "Morale", value: state.resources.morale },
+          { label: "Research", value: `${state.research.progress}/${state.research.threshold}` },
+          { label: "Research Level", value: state.research.level },
+          { label: "Queue", value: state.buildQueue.length ? state.buildQueue[0].name : "Clear" }
+        ];
+
+        items.forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "meter";
+          row.innerHTML = `<span>${item.label}</span><strong>${item.value}</strong>`;
+          metersEl.appendChild(row);
+        });
+      }
+
+      function resizeCanvas() {
+        const rect = mapCanvas.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1;
+        mapCanvas.width = rect.width * ratio;
+        mapCanvas.height = rect.height * ratio;
+        drawMap();
+      }
+
+      function drawRiver(ctx, ratio, width, height) {
+        ctx.save();
+        ctx.strokeStyle = ownerColors.player;
+        ctx.lineWidth = 8 * ratio;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(40 * ratio, 320 * ratio);
+        ctx.bezierCurveTo(140 * ratio, 260 * ratio, 220 * ratio, 240 * ratio, 300 * ratio, 170 * ratio);
+        ctx.bezierCurveTo(360 * ratio, 110 * ratio, 460 * ratio, 140 * ratio, 610 * ratio, 60 * ratio);
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(58, 141, 181, 0.35)";
+        ctx.lineWidth = 18 * ratio;
+        ctx.beginPath();
+        ctx.moveTo(40 * ratio, 330 * ratio);
+        ctx.bezierCurveTo(140 * ratio, 270 * ratio, 220 * ratio, 250 * ratio, 300 * ratio, 180 * ratio);
+        ctx.bezierCurveTo(360 * ratio, 120 * ratio, 460 * ratio, 150 * ratio, 610 * ratio, 70 * ratio);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawNodes(ctx, ratio) {
+        state.nodes.forEach((node) => {
+          const isContested = node.contested;
+          const color = isContested ? ownerColors.contested : ownerColors[node.owner];
+          ctx.beginPath();
+          ctx.fillStyle = color;
+          ctx.strokeStyle = "rgba(29, 31, 35, 0.2)";
+          ctx.lineWidth = 2 * ratio;
+          ctx.arc(node.x * ratio, node.y * ratio, 14 * ratio, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(29, 31, 35, 0.8)";
+          ctx.font = `${12 * ratio}px ${getComputedStyle(document.body).fontFamily}`;
+          ctx.fillText(node.name, node.x * ratio + 18 * ratio, node.y * ratio + 4 * ratio);
+        });
+      }
+
+      function drawMap() {
+        const ctx = mapCanvas.getContext("2d");
+        const ratio = window.devicePixelRatio || 1;
+        ctx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+        ctx.fillStyle = "#eef3f7";
+        ctx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
+        drawRiver(ctx, ratio, mapCanvas.width, mapCanvas.height);
+        drawNodes(ctx, ratio);
+      }
+
+      function resourceProduction() {
+        let grain = 0;
+        let iron = 0;
+        state.nodes.forEach((node) => {
+          if (node.owner === "player") {
+            grain += node.production.grain;
+            iron += node.production.iron;
+          }
+        });
+        state.resources.grain += grain;
+        state.resources.iron += iron;
+        addLog(`Resource production: +${grain} grain, +${iron} iron.`);
+      }
+
+      function resolveBuildQueue() {
+        if (!state.buildQueue.length) {
+          addLog("Build queue clear. No projects to resolve.");
+          return;
+        }
+
+        const current = state.buildQueue[0];
+        const canPay = state.resources.grain >= current.cost.grain && state.resources.iron >= current.cost.iron;
+
+        if (canPay) {
+          state.resources.grain -= current.cost.grain;
+          state.resources.iron -= current.cost.iron;
+          state.buildQueue.shift();
+          state.resources.morale = Math.min(100, state.resources.morale + 4);
+          addLog(`Build queue resolved: ${current.name} completed (${current.impact}).`);
+        } else {
+          addLog(`Build queue stalled: ${current.name} needs ${current.cost.grain} grain and ${current.cost.iron} iron.`);
+        }
+      }
+
+      function researchProgress() {
+        const labBonus = state.nodes.filter((node) => node.owner === "player").length * 4;
+        state.research.progress += 12 + labBonus;
+        addLog(`Research advanced by ${12 + labBonus} points.`);
+
+        if (state.research.progress >= state.research.threshold) {
+          state.research.progress -= state.research.threshold;
+          state.research.level += 1;
+          state.resources.morale = Math.min(100, state.resources.morale + 6);
+          addLog(`Research breakthrough! Level ${state.research.level} achieved, morale bolstered.`);
+        }
+      }
+
+      function aiActionSelection() {
+        const neutralNodes = state.nodes.filter((node) => node.owner === "neutral");
+        const playerNodes = state.nodes.filter((node) => node.owner === "player");
+        const roll = Math.random();
+        let target = null;
+        let action = "";
+
+        if (roll < 0.4 && neutralNodes.length) {
+          target = neutralNodes[Math.floor(Math.random() * neutralNodes.length)];
+          action = "expands";
+        } else if (playerNodes.length) {
+          target = playerNodes[Math.floor(Math.random() * playerNodes.length)];
+          action = "pressures";
+        }
+
+        if (target) {
+          target.contested = true;
+          state.aiPressure += 1;
+          addLog(`Oracle AI ${action} ${target.name}, contesting the node.`);
+        } else {
+          addLog("Oracle AI repositions forces but finds no immediate target.");
+        }
+      }
+
+      function resolveContestedNodes() {
+        state.nodes.forEach((node) => {
+          if (!node.contested) {
+            return;
+          }
+
+          const roll = Math.random();
+          const playerEdge = state.resources.morale / 120;
+          const aiEdge = state.aiPressure / 10;
+          const outcome = roll + playerEdge - aiEdge;
+
+          if (outcome >= 0.5) {
+            node.owner = "player";
+            state.resources.morale = Math.min(100, state.resources.morale + 3);
+            addLog(`Contested node secured: ${node.name} held for the player.`);
+          } else {
+            node.owner = "ai";
+            state.resources.morale = Math.max(0, state.resources.morale - 5);
+            addLog(`Contested node lost: ${node.name} captured by the Oracle AI.`);
+          }
+          node.contested = false;
+        });
+      }
+
+      function eventRoll() {
+        const events = [
+          { text: "A sudden flood accelerates river trade.", effect: () => { state.resources.grain += 8; } },
+          { text: "Supply scouts report hidden ore seams.", effect: () => { state.resources.iron += 6; } },
+          { text: "Rumors ripple through camps.", effect: () => { state.resources.morale = Math.max(0, state.resources.morale - 4); } },
+          { text: "Veteran captains drill fresh crews.", effect: () => { state.resources.morale = Math.min(100, state.resources.morale + 5); } }
+        ];
+
+        const event = events[Math.floor(Math.random() * events.length)];
+        event.effect();
+        addLog(`Event: ${event.text}`);
+      }
+
+      function buildSummary() {
+        const playerNodes = state.nodes.filter((node) => node.owner === "player").length;
+        const aiNodes = state.nodes.filter((node) => node.owner === "ai").length;
+        const neutralNodes = state.nodes.filter((node) => node.owner === "neutral").length;
+        return [
+          `Turn ${state.turn} Summary`,
+          `Resources: ${state.resources.grain} grain, ${state.resources.iron} iron, morale ${state.resources.morale}.`,
+          `Research: level ${state.research.level} (${state.research.progress}/${state.research.threshold}).`,
+          `Nodes: Player ${playerNodes}, Oracle AI ${aiNodes}, Neutral ${neutralNodes}.`,
+          `Build queue: ${state.buildQueue.length ? state.buildQueue[0].name : "No active projects"}.`
+        ].join("\n");
+      }
+
+      function updateSummary() {
+        const summary = buildSummary();
+        state.lastSummary = summary;
+        outputEl.value = summary;
+      }
+
+      function runTurn() {
+        if (state.turn >= state.maxTurns) {
+          setStatus(actionStatus, "Campaign complete. Reset to play again.", "error");
+          return;
+        }
+
+        state.turn += 1;
+        setStatus(actionStatus, `Executing turn ${state.turn}...`);
+
+        resourceProduction();
+        resolveBuildQueue();
+        researchProgress();
+        aiActionSelection();
+        resolveContestedNodes();
+        eventRoll();
+
+        updateSummary();
+        updateMeters();
+        drawMap();
+
+        turnStatus.textContent = `Turn ${state.turn} of ${state.maxTurns}.`;
+        setStatus(actionStatus, `Turn ${state.turn} complete.`, "success");
+      }
+
+      function runLoop() {
+        const turnsRemaining = state.maxTurns - state.turn;
+        if (turnsRemaining <= 0) {
+          setStatus(actionStatus, "Campaign already completed.", "error");
+          return;
+        }
+
+        for (let i = 0; i < turnsRemaining; i += 1) {
+          runTurn();
+        }
+      }
+
+      function resetScenario() {
+        state = baseState();
+        logEl.innerHTML = "";
+        outputEl.value = "";
+        updateMeters();
+        drawMap();
+        turnStatus.textContent = `Turn ${state.turn} of ${state.maxTurns}. Ready to begin.`;
+        setStatus(actionStatus, "Scenario reset.", "success");
+      }
+
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          setStatus(copyStatus, "Copied to clipboard.", "success");
+        } catch (error) {
+          outputEl.select();
+          document.execCommand("copy");
+          setStatus(copyStatus, "Copied to clipboard.", "success");
+        }
+      }
+
+      runTurnButton.addEventListener("click", runTurn);
+      runLoopButton.addEventListener("click", runLoop);
+      resetButton.addEventListener("click", resetScenario);
+
+      copySummaryButton.addEventListener("click", () => {
+        if (!outputEl.value.trim()) {
+          setStatus(copyStatus, "Run the simulation to generate a summary.", "error");
+          return;
+        }
+        copyText(outputEl.value.trim());
+      });
+
+      copyStateButton.addEventListener("click", () => {
+        const snapshot = JSON.stringify(state, null, 2);
+        copyText(snapshot);
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+
+      updateMeters();
+      resizeCanvas();
+    </script>
+  </body>
+</html>
