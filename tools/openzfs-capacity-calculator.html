@@ -587,30 +587,30 @@
         }
 
         table.inputs,
-        table.inputs tbody,
-        table.inputs tr,
-        table.inputs td {
+        table.inputs tbody {
           display: block;
           width: 100%;
         }
 
         table.inputs tr {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px 12px;
           padding: 10px 0;
           border-bottom: 1px solid rgba(31, 28, 23, 0.1);
         }
 
         table.inputs tr td {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          width: calc(50% - 6px);
           text-align: left;
           padding: 4px 0;
         }
 
-        table.inputs tr td:nth-child(1),
-        table.inputs tr td:nth-child(2),
-        table.inputs tr td:nth-child(3),
-        table.inputs tr td:nth-child(4) {
+        table.inputs tr td.full-width {
           width: 100%;
-          padding-left: 0;
-          padding-right: 0;
         }
 
         table.inputs tr td table.shelf_count,
@@ -721,7 +721,7 @@
           <td><input type="text" id="add_disk" name="add_disk"></td>
         </tr>
         <tr>
-          <td id="add_disk_buttons" colspan="2">
+          <td id="add_disk_buttons" colspan="2" class="full-width">
             <div class="rocker-button">
               <div class="half up" id="plus_1"><div class="arrow">+</div></div>
               <div class="center-text">1</div>
@@ -801,7 +801,7 @@
               <option value="16384">16 MiB</option>
             </select>
           </td>
-          <td id="vdev_button" colspan="2"><button type="button" id="add_vdev">Add vdev Layout</button></td>
+          <td id="vdev_button" colspan="2" class="full-width"><button type="button" id="add_vdev">Add vdev Layout</button></td>
         </tr>
         <tr>
           <td><label class="tooltip" id="ashift">?</label><label for="ashift">ZFS ashift value:</label></td>
@@ -906,10 +906,10 @@
               <option value="draid">dRAID</option>
             </select>
           </td>
-          <td id="reset_button" colspan="2"><button type="button" id="reset_button">Reset</button></td>
+          <td id="reset_button" colspan="2" class="full-width"><button type="button" id="reset_button">Reset</button></td>
         </tr>
         <tr>
-          <td id="status" colspan="4"></td>
+          <td id="status" colspan="4" class="full-width"></td>
         </tr>
       </table>
 
@@ -1864,6 +1864,12 @@
           update_debug("18t7wz2");
         });
 
+        $("input.monitor[type='text']").on("input", function() {
+          update();
+          update_shelf_count();
+          update_debug("18t7wz2");
+        });
+
         $("input#show_afr").change(function() {
           draw_tables();
           update();
@@ -1904,7 +1910,7 @@
           tr_text += "<td><input class=\"monitor\" type=\"checkbox\" id=\"use_new_slop\" name=\"use_new_slop\" checked></td>";
 
           if (raid_type == "draid") {
-            tr_text += "<td id=\"draid_settings\" colspan=\"2\">";
+            tr_text += "<td id=\"draid_settings\" colspan=\"2\" class=\"full-width\">";
             tr_text += "<label class=\"draid_settings\">draid</label>";
             tr_text += "<input type=\"text\"  class=\"draid_settings\" id=\"draid_parity\">";
             tr_text += "<label class=\"draid_settings\">:</label>";
