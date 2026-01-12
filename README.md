@@ -34,6 +34,10 @@ Your site will be available at `https://tarazevits.io/tools/`.
 
 There are no build, test, or lint commands yet.
 
+For local previews, start a web server from the repo root (for example, `python -m http.server 8000`)
+and open pages with the correct path, such as `http://localhost:8000/` or
+`http://localhost:8000/tools/<tool-name>.html`.
+
 ## Included tools
 
 - `tools/json-to-yaml.html` - Convert JSON into YAML.
